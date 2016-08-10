@@ -7,9 +7,9 @@ def hex_ascii(c):
 	if c < 0x80 and chr(c).isprintable(): r += ' (' + chr(c) + ')'
 	return r
 
-def getch(s):
+def getch(s, verbose = True):
 	c = s.read()[0]
-	print('getch(): ' + hex_ascii(c))
+	if verbose: print('getch(): ' + hex_ascii(c))
 	return c
 
 def getNch(s, count):
@@ -148,7 +148,9 @@ def main_loop(ser):
 			length += getch(ser)
 			if getch(ser) == ord('E'): eeprom = True
 			else: eeprom = False
-			for _ in range(length): getch(ser)
+			for off in range(length):
+				print(format(address + off, '#08x') + ': '
+				      + format(getch(ser, False), '#04x'))
 			if getch(ser) == ord(' '):
 				print(rw_msg('write', length, address, eeprom))
 				putch(ser, 0x14)
