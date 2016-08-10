@@ -121,32 +121,34 @@ def main_loop(ser):
 				byte_response(ser, 0x00)
 
 		elif ch == ord('U'):
+			# little-endian, word address
 			address = getch(ser)
 			address += getch(ser) << 8
-			address <<= 1
+			# convert word address to byte address
+			address *= 2
 			print('load address: ' + format(address, '#08x') +
 			      ' (byte address)')
 			nothing_response(ser)
 
 		elif ch == ord('t'):
+			# big-endian, in bytes
 			length = getch(ser) << 8
-			length = getch(ser)
+			length += getch(ser)
 			if getch(ser) == ord('E'): eeprom = True
 			else: eeprom = False
 			if getch(ser) == ord(' '):
 				print(rw_msg('read', length, address, eeprom))
 				putch(ser, 0x14)
-				for _ in range(length):
-					putch(ser, 0xff)
+				for _ in range(length): putch(ser, 0xff)
 				putch(ser, 0x10)
 
 		elif ch == ord('d'):
+			# big-endian, in bytes
 			length = getch(ser) << 8
-			length = getch(ser)
+			length += getch(ser)
 			if getch(ser) == ord('E'): eeprom = True
 			else: eeprom = False
-			for _ in range(length):
-				getch(ser)
+			for _ in range(length): getch(ser)
 			if getch(ser) == ord(' '):
 				print(rw_msg('write', length, address, eeprom))
 				putch(ser, 0x14)
